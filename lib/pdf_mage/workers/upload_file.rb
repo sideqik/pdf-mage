@@ -17,6 +17,7 @@ module PdfMage
         pdf_filename = "#{$config.pdf_directory}/#{pdf_id}.pdf"
         obj.upload_file(pdf_filename)
         pdf_url = obj.presigned_url(:get, expires_in: $config.aws_presigned_url_duration)
+        %x[rm #{pdf_filename}]
 
         if callback_url
           PdfMage::Workers::SendWebhook.perform_async(callback_url, pdf_url, meta)
