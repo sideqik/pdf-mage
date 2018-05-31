@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.summary            = %q{A lightweight Ruby gem for rendering PDFs with Chrome Headless}
   spec.homepage           = 'https://github.com/sideqik/pdf-mage'
   spec.license            = 'MIT'
-  spec.executables        = ['pdf_mage']
+  spec.executables        = ['pdf_mage', 'pdf_mage_work']
   spec.require_paths      = ['lib']
   spec.bindir             = 'bin'
 
@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
     f.match(%r{^(test|spec|features)/})
   end
 
+  spec.add_dependency 'aws-sdk-s3', '~> 1'
   spec.add_dependency 'redis', '~> 4.0'
   spec.add_dependency 'sidekiq', '~> 5.1'
   spec.add_dependency 'sinatra', '~> 2.0'
