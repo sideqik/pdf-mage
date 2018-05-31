@@ -3,6 +3,7 @@ PATH
   specs:
     pdf_mage (0.1.0)
       god (~> 0.13.6)
+      redis (~> 4.0)
       sidekiq (~> 5.1)
       sinatra (~> 2.0)
 

@@ -1,4 +1,3 @@
-require 'pdf_mage/api'
 require 'sinatra'
 
 module PdfMage
