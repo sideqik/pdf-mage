@@ -23,7 +23,7 @@ module PdfMage
       post '/api/render' do
         url          = required_param(:url)
         callback_url = required_param(:callback_url)
-        meta         = params[:meta]
+        meta         = params[:meta] || ""
 
         job_id = PdfMage::Workers::RenderPdf.perform_async(url, callback_url, meta)
         {result: 'ok', job_id: job_id}.to_json

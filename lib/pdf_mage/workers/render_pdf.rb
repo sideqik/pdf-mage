@@ -4,6 +4,7 @@ module PdfMage
   module Workers
     class RenderPdf < PdfMage::Workers::Base
       def perform(website_url, callback_url, meta)
+        puts "Rendering [#{website_url}] with callback [#{callback_url}] and meta: #{meta.inspect}"
         pdf_id = SecureRandom.uuid
         system("chrome --headless --disable-gpu --print-to-pdf=#{pdf_id}.pdf #{website_url}")
 
