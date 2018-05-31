@@ -1,2 +1,3 @@
+api_secret: '12345'
 aws_account_id: 'aws-id'
 aws_account_secret: 'secret'
