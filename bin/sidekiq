@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+bundle exec sidekiq -r ./lib/pdf_mage.rb -q pdfmage

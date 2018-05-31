@@ -5,6 +5,8 @@ require 'aws-sdk-s3'
 module PdfMage
   module Workers
     class UploadFile < PdfMage::Workers::Base
+      sidekiq_options queue: 'pdfmage'
+
       def perform(pdf_id, callback_url, meta)
         s3 = Aws::S3::Resource.new(
           access_key_id: $config.aws_account_id,

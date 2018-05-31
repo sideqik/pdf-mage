@@ -6,6 +6,8 @@ require 'securerandom'
 module PdfMage
   module Workers
     class RenderPdf < PdfMage::Workers::Base
+      sidekiq_options queue: 'pdfmage'
+
       def perform(website_url, callback_url, meta)
         puts "Rendering [#{website_url}] with callback [#{callback_url}] and meta: #{meta.inspect}"
         pdf_id = SecureRandom.uuid
