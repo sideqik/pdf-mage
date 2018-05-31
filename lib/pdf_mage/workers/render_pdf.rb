@@ -7,7 +7,7 @@ module PdfMage
         pdf_id = SecureRandom.uuid
         system("chrome --headless --disable-gpu --print-to-pdf=#{pdf_id}.pdf #{website_url}")
 
-        if APP_CONFIG.aws_account_id
+        if $config.aws_account_id
           UploadFile.perform_async(pdf_id, callback_url, meta)
         elsif callback_url
           SendWebhook.perform_async(callback_url, "#{pdf_id}.pdf", meta)
