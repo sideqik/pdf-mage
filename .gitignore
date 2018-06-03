@@ -10,3 +10,4 @@
 /pdfs/
 *.local
 *.log
+/spec/examples.txt
