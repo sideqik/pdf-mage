@@ -17,7 +17,7 @@ module PdfMage
 
         `#{CONFIG.chrome_exe} --headless --disable-gpu --print-to-pdf=#{pdf_filename(pdf_id)} #{website_url}`
 
-        if CONFIG.aws_account_id
+        if CONFIG.aws_account_key
           PdfMage::Workers::UploadFile.perform_async(pdf_id, callback_url, meta)
         elsif string_exists?(callback_url)
           PdfMage::Workers::SendWebhook.perform_async(pdf_filename(pdf_id), callback_url, meta)

@@ -1,5 +1,5 @@
 api_secret: null
-aws_account_id: null
+aws_account_key: null
 aws_account_bucket: null
 aws_account_region: 'us-east-1'
 aws_account_secret: null

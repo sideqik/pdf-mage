@@ -9,7 +9,7 @@ module PdfMage
     class UploadFile < PdfMage::Workers::Base
       def perform(pdf_id, callback_url = nil, meta = nil)
         s3 = Aws::S3::Resource.new(
-          access_key_id: CONFIG.aws_account_id,
+          access_key_id: CONFIG.aws_account_key,
           region: CONFIG.aws_account_region,
           secret_access_key: CONFIG.aws_account_secret
         )
