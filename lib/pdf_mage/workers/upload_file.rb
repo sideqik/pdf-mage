@@ -4,24 +4,21 @@ require 'aws-sdk-s3'
 
 module PdfMage
   module Workers
+    # A Sidekiq job that uploads a rendered PDF to Amazon S3.
+    # @since 0.1.0
     class UploadFile < PdfMage::Workers::Base
-      def perform(pdf_id, callback_url=nil, meta=nil)
+      def perform(pdf_id, callback_url = nil, meta = nil)
         s3 = Aws::S3::Resource.new(
-          access_key_id: $config.aws_account_id,
-          region: $config.aws_account_region,
-          secret_access_key: $config.aws_account_secret
+          access_key_id: CONFIG.aws_account_id,
+          region: CONFIG.aws_account_region,
+          secret_access_key: CONFIG.aws_account_secret
         )
-        obj = s3.bucket($config.aws_account_bucket).object(pdf_id)
+        obj = s3.bucket(CONFIG.aws_account_bucket).object(pdf_id)
         obj.upload_file(pdf_filename(pdf_id))
-        pdf_url = obj.presigned_url(:get, expires_in: $config.aws_presigned_url_duration)
+        pdf_url = obj.presigned_url(:get, expires_in: CONFIG.aws_presigned_url_duration)
 
-        if $config.delete_file_on_upload
-          %x[rm #{pdf_filename(pdf_id)}]
-        end
-
-        if callback_url && !callback_url.empty?
-          PdfMage::Workers::SendWebhook.perform_async(pdf_url, callback_url, meta)
-        end
+        `rm #{pdf_filename(pdf_id)}` if CONFIG.delete_file_on_upload
+        PdfMage::Workers::SendWebhook.perform_async(pdf_url, callback_url, meta) if string_present?(callback_url)
       end
     end
   end

@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'pdf_mage/version'
 
 Gem::Specification.new do |spec|
   spec.name               = 'pdf_mage'
   spec.version            = PdfMage::VERSION
-  spec.authors            = ['Jeremy Haile', 'Dean Papastrat']
-  spec.email              = ['jeremy@sideqik.com', 'dean@sideqik.com']
-  spec.summary            = %q{A lightweight Ruby gem for rendering PDFs with Chrome Headless}
+  spec.authors            = %w[Jeremy Haile Dean Papastrat]
+  spec.email              = %w[jeremy@sideqik.com dean@sideqik.com]
+  spec.summary            = 'A lightweight Ruby gem for rendering PDFs with Chrome Headless'
   spec.homepage           = 'https://github.com/sideqik/pdf-mage'
   spec.license            = 'MIT'
-  spec.executables        = ['pdf_mage', 'pdf_mage_work']
-  spec.require_paths      = ['lib']
+  spec.executables        = %w[pdf_mage]
+  spec.require_paths      = %w[lib]
   spec.bindir             = 'bin'
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
@@ -24,8 +24,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'redis', '~> 4.0'
   spec.add_dependency 'sidekiq', '~> 5.1'
   spec.add_dependency 'sinatra', '~> 2.0'
-  spec.add_dependency 'typhoeus', '~> 1.1.0'
+  spec.add_dependency 'typhoeus', '~> 1.1'
 
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'rubocop', '~> 0.56'
 end
