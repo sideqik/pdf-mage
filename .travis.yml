@@ -1,0 +1,6 @@
+language: ruby
+addons:
+  chrome: stable
+script:
+  - bundle exec rubocop
+  - bundle exec rspec
