@@ -1,4 +1,5 @@
 language: ruby
+cache: bundler
 addons:
   chrome: stable
 script:
