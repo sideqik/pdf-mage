@@ -1,7 +1,10 @@
-api_secret: '12345'
-aws_account_id: 'account-id'
-aws_account_bucket: 'account-bucket'
-aws_account_bucket_directory: 'account-bucket-directory'
+api_secret: null
+aws_account_id: null
+aws_account_bucket: null
 aws_account_region: 'us-east-1'
-aws_account_secret: 'account-secret'
+aws_account_secret: null
+aws_presigned_url_duration: 600
+chrome_exe: chrome
+delete_file_on_upload: true
+log_level: 'info'
 pdf_directory: 'pdfs'

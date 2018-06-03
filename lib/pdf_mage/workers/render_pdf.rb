@@ -6,21 +6,16 @@ require 'securerandom'
 module PdfMage
   module Workers
     class RenderPdf < PdfMage::Workers::Base
-      sidekiq_options queue: 'pdfmage'
-
-      def perform(website_url, callback_url, meta)
-        puts "Rendering [#{website_url}] with callback [#{callback_url}] and meta: #{meta.inspect}"
-        pdf_id = SecureRandom.uuid
-        pdf_filename = "#{$config.pdf_directory}/#{pdf_id}.pdf"
-        %x[
-          source ~/.bash_profile
-          chrome --headless --disable-gpu --print-to-pdf=#{pdf_filename} #{website_url}
-        ]
+      def perform(website_url, callback_url=nil, filename=nil, meta=nil)
+        $logger.info "Rendering [#{website_url}] with callback [#{callback_url}] and meta: #{meta.inspect}"
+        pdf_id = filename && !filename.empty? ? filename : SecureRandom.uuid
+        ensure_directory_exists_for_pdf(pdf_filename(pdf_id))
+        %x[#{$config.chrome_exe} --headless --disable-gpu --print-to-pdf=#{pdf_filename(pdf_id)} #{website_url}]
 
         if $config.aws_account_id
           PdfMage::Workers::UploadFile.perform_async(pdf_id, callback_url, meta)
-        elsif callback_url
-          PdfMage::Workers::SendWebhook.perform_async(callback_url, pdf_filename, meta)
+        elsif callback_url && !callback_url.empty?
+          PdfMage::Workers::SendWebhook.perform_async(pdf_filename(pdf_id), callback_url, meta)
         end
       end
     end

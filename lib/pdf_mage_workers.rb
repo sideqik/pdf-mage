@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+$mode = 'worker'.freeze
+
 require 'pdf_mage/init'
 require 'pdf_mage/workers/render_pdf'
 require 'pdf_mage/workers/send_webhook'

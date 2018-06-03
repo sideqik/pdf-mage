@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'sinatra'
 require 'json'
+require 'pdf_mage/workers/render_pdf'
 
 module PdfMage
   module Api
@@ -8,7 +11,6 @@ module PdfMage
 
       before do
         content_type :json
-        error(401, 'Unauthorized') unless params[:token].strip == $config.api_secret
       end
 
       error do
@@ -16,17 +18,25 @@ module PdfMage
         error(500, e.message)
       end
 
-      get '/api/ping' do
-        'pong'
+      get '/status' do
+        { result: 'ok' }.to_json
       end
 
-      post '/api/render' do
+      post '/render' do
+        authorize()
         url          = required_param(:url)
         callback_url = required_param(:callback_url)
+        filename     = params[:filename]
         meta         = params[:meta] || ""
 
-        job_id = PdfMage::Workers::RenderPdf.perform_async(url, callback_url, meta)
-        {result: 'ok', job_id: job_id}.to_json
+        job_id = PdfMage::Workers::RenderPdf.perform_async(url, callback_url, filename, meta)
+        { result: 'ok', job_id: job_id }.to_json
+      end
+
+      def authorize
+        if $config.api_secret
+          error(401, 'Unauthorized') unless params[:token] && params[:token].strip == $config.api_secret
+        end
       end
 
       def error(code, message)
