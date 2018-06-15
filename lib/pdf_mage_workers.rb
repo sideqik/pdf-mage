@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-MODE = 'worker'.freeze
+MODE = 'worker'
 
 require 'pdf_mage/init'
 require 'pdf_mage/workers/render_pdf'

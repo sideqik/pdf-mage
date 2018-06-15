@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-MODE = 'api'.freeze
+MODE = 'api'
 
 require 'pdf_mage/init'
 require 'pdf_mage/api/app'

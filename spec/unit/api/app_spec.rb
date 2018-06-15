@@ -5,7 +5,7 @@ require 'pdf_mage/api/app'
 RSpec.describe PdfMage::Api::App do
   describe '/render' do
     it 'starts a render job' do
-      # TODO: add a spec
+      # expect(PdfMage::Workers::RenderPdf).to receive(:perform_async)
     end
   end
 

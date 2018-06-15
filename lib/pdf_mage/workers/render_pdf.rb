@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'base'
 require_relative 'send_webhook'
 require_relative 'upload_file'
@@ -12,7 +14,15 @@ module PdfMage
       def perform(website_url, callback_url = nil, filename = nil, meta = nil)
         LOGGER.info "Rendering [#{website_url}] with callback [#{callback_url}] and meta: #{meta.inspect}"
 
-        pdf_id = filename && !filename.empty? ? filename : SecureRandom.uuid
+        stripped_filename = strip_string(filename)
+        stripped_filename_present = string_exists?(stripped_filename)
+
+        # If a filename exists and the stripped version causes the string to be empty, warn about it in the logs.
+        if filename && !stripped_filename_present
+          LOGGER.warn "'#{filename}' is not a valid ASCII string, falling back to UUID for PDF name."
+        end
+
+        pdf_id = stripped_filename_present ? stripped_filename : SecureRandom.uuid
         ensure_directory_exists_for_pdf(pdf_filename(pdf_id))
 
         `#{CONFIG.chrome_exe} --headless --disable-gpu --print-to-pdf=#{pdf_filename(pdf_id)} #{website_url}`
