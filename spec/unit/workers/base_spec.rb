@@ -2,9 +2,56 @@
 
 require 'fileutils'
 require 'pdf_mage/workers/base'
+require 'uri'
 
 RSpec.describe PdfMage::Workers::Base do
   subject { PdfMage::Workers::Base.new }
+
+  describe '#secretize_url' do
+    let(:url) { nil }
+    subject { super().secretize_url(url) }
+
+    context 'when an API secret is present' do
+      before do
+        allow(CONFIG).to receive(:api_secret).and_return('SECRET')
+      end
+
+      let(:url) { 'https://sideqik.com/influencers?ids=1,2,3' }
+      it 'adds the secret to the url' do
+        query_params = URI.decode_www_form(URI(subject).query).to_h
+        expect(query_params).to include('secret' => 'SECRET')
+      end
+
+      it 'leaves the resource intact' do
+        expect(subject).to start_with('https://sideqik.com/influencers')
+      end
+
+      it 'leaves params intact' do
+        query_params = URI.decode_www_form(URI(subject).query).to_h
+        expect(query_params).to include('ids' => '1,2,3')
+      end
+    end
+
+    context 'when API secret is not present' do
+      let(:url) { 'https://sideqik.com/influencers?ids=1,2,3' }
+      it 'returns the URL without a secret added' do
+        expect(subject).to eq(url)
+      end
+    end
+
+    context 'when url is not present' do
+      it 'raises an error' do
+        expect { subject }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'when url is not a valid URL' do
+      let(:url) { 'sideqik.com' }
+      it 'raises an error' do
+        expect { subject }.to raise_error(ArgumentError)
+      end
+    end
+  end
 
   describe '#ensure_directory_exists_for_pdf' do
     let(:filename) { nil }

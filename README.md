@@ -66,6 +66,29 @@ CONFIG_FILE=config.yml.local bin/pdf_mage
 CONFIG_FILE=config.yml.local bin/sidekiq
 ```
 
+### Using the "Secret" for Security
+
+If you use the API secret config option, you can add security to your application. Adding a secret will:
+
+1. Require you to pass a "secret" param with every request to PDF Mage's render resource, where the value is the secret set in the config.
+2. Request the website url you want PDF Mage to render with a "secret" parameter, with the value you set in the config.
+3. Sign the webhook sent to your server with a SHA256 hexdigest as a "X-Pdf-Signature" header. See info about checking the signature below.
+
+**To check the X-Pdf-Signature header:**
+
+1. Create a SHA256 HMAC hexdigest using the config secret as the key and the response body as the data.
+2. Compare the hexdigest to the signature provided.
+
+**Example in Ruby:**
+
+```ruby
+# Generate the signature that should have been returned
+valid_signature = OpenSSL::HMAC.hexdigest('sha256', CONFIG.api_secret, response.body)
+
+# Compare the signatures
+response.headers['X-Pdf-Signature'] == valid_signature
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

@@ -21,7 +21,7 @@ module PdfMage
           'user-agent' => 'PdfMage/1.0'
         }
 
-        headers['X-Pdf-Signature'] = OpenSSL::HMAC.hexdigest('sha1', CONFIG.api_secret, data) if CONFIG.api_secret
+        headers['X-Pdf-Signature'] = OpenSSL::HMAC.hexdigest('sha256', CONFIG.api_secret, data) if CONFIG.api_secret
 
         response = Typhoeus.post(callback_url, headers: headers, body: data, ssl_verifypeer: !CONFIG.env.development)
         LOGGER.info "Received response with status [#{response.code}]: #{response.body}"

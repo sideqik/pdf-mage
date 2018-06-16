@@ -23,7 +23,7 @@ module PdfMage
         pdf_url = obj.presigned_url(:get, expires_in: CONFIG.aws_presigned_url_duration)
 
         `rm #{pdf_filename(pdf_id)}` if CONFIG.delete_file_on_upload
-        PdfMage::Workers::SendWebhook.perform_async(pdf_url, callback_url, meta) if string_present?(callback_url)
+        PdfMage::Workers::SendWebhook.perform_async(pdf_url, callback_url, meta) if string_exists?(callback_url)
       end
 
       private

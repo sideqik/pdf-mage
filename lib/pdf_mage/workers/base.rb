@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'sidekiq'
+require 'uri'
 
 module PdfMage
   module Workers
@@ -61,6 +62,26 @@ module PdfMage
         filename += '.pdf' unless pdf_id.end_with?('.pdf')
 
         @filename = filename
+      end
+
+      # Adds the API secret to a URL.
+      #
+      # @param [String] url - URL to add the API secret from the config to
+      # @return [String] url with secret
+      #
+      # @raise [ArgumentError] if url is nil or an empty string
+      def secretize_url(url)
+        unless string_exists?(url) && (uri = URI(url)) && uri.scheme&.match(/^https?$/)
+          raise ArgumentError, 'url must be a valid url using the http/s protocol.'
+        end
+
+        if CONFIG.api_secret
+          new_query_params = URI.decode_www_form(uri.query.to_s) << ['secret', CONFIG.api_secret]
+          uri.query = URI.encode_www_form(new_query_params)
+          uri.to_s
+        else
+          url
+        end
       end
 
       # Checks if the given string is not nil and is not empty, like ActiveSupport's String#present?

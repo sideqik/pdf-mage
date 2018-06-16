@@ -25,7 +25,9 @@ module PdfMage
         pdf_id = stripped_filename_present ? stripped_filename : SecureRandom.uuid
         ensure_directory_exists_for_pdf(pdf_filename(pdf_id))
 
-        `#{CONFIG.chrome_exe} --headless --disable-gpu --print-to-pdf=#{pdf_filename(pdf_id)} #{website_url}`
+        url_with_secret = secretize_url(website_url)
+
+        `#{CONFIG.chrome_exe} --headless --disable-gpu --print-to-pdf=#{pdf_filename(pdf_id)} #{url_with_secret}`
 
         if CONFIG.aws_account_key
           PdfMage::Workers::UploadFile.perform_async(pdf_id, callback_url, meta)

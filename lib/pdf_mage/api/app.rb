@@ -28,7 +28,7 @@ module PdfMage
       post '/render' do
         authorize!
         url = required_param(:url)
-        callback_url = required_param(:callback_url)
+        callback_url = params[:callback_url]
         filename = params[:filename]
         meta = params[:meta]
 
@@ -38,7 +38,7 @@ module PdfMage
 
       def authorize!
         return unless CONFIG.api_secret
-        error(401, 'Unauthorized') unless params[:token] && params[:token].strip == CONFIG.api_secret
+        error(401, 'Unauthorized') unless params[:secret] && params[:secret].strip == CONFIG.api_secret
       end
 
       def error(code, message)
