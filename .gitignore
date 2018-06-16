@@ -9,5 +9,6 @@
 .DS_Store
 /pdfs/
 *.local
+*.local.yml
 *.log
 /spec/examples.txt

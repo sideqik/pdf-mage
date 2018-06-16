@@ -13,19 +13,23 @@ env_config.current = current_env
 ENVIRONMENTS.each { |env| env_config[env] = current_env == env }
 
 # Load Config Files
-config_filename = ENV['CONFIG_FILE'] ? File.expand_path(ENV['CONFIG_FILE']) : nil
-config_file = config_filename ? File.new(config_filename) : nil
-default_config_file = File.new(File.expand_path('lib/pdf_mage/config.yml'))
+user_config_filename = ENV['CONFIG_FILE'] ? File.expand_path(ENV['CONFIG_FILE']) : 'config.local.yml'
+default_config_file  = File.new(File.expand_path('lib/pdf_mage/config.yml'))
 
 # Build Configuration
-default_config = YAML.safe_load(default_config_file).to_h
-user_config = config_file ? YAML.safe_load(config_file).to_h : {}
-config_hash = default_config.merge(user_config)
-config = OpenStruct.new(config_hash)
-config.env = env_config.freeze
-CONFIG = config.freeze
+config_hash = YAML.safe_load(default_config_file).to_h
+
+if File.exist?(user_config_filename)
+  user_config_file = File.new(user_config_filename)
+  user_config      = YAML.safe_load(user_config_file).to_h
+  config_hash      = config_hash.merge(user_config)
+end
+
+config      = OpenStruct.new(config_hash)
+config.env  = env_config.freeze
+CONFIG      = config.freeze
 
 # Build Logger
-LOGGER = Logger.new('pdfmage.log')
+LOGGER = Logger.new(STDOUT)
 LOGGER.level = CONFIG.log_level
 LOGGER.freeze
