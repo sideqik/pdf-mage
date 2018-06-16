@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'English'
 require_relative 'base'
 require_relative 'send_webhook'
 require_relative 'upload_file'
@@ -28,8 +29,11 @@ module PdfMage
 
         `#{CONFIG.chrome_exe} --headless --disable-gpu --print-to-pdf=#{pdf_filename(pdf_id)} #{url_with_secret}`
 
-        raise "Error executing chrome PDF export. Status: [#{status}]" unless $CHILD_STATUS.zero?
-        LOGGER.info "Rendered PDF [#{pdf_id}] with status [#{status}]"
+        unless $CHILD_STATUS.exitstatus.zero?
+          raise "Error executing chrome PDF export. Status: [#{$CHILD_STATUS.exitstatus}]"
+        end
+
+        LOGGER.info "Rendered PDF [#{pdf_id}] with status [#{$CHILD_STATUS.exitstatus}]"
 
         if CONFIG.aws_account_key
           PdfMage::Workers::UploadFile.perform_async(pdf_id, callback_url, meta)
