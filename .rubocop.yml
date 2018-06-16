@@ -2,7 +2,7 @@ AllCops:
   TargetRubyVersion: 2.5.1
 
 Metrics/AbcSize:
-  Max: 20
+  Max: 25
 
 Metrics/BlockLength:
   Exclude:
@@ -15,3 +15,9 @@ Metrics/MethodLength:
   Max: 25
   Exclude:
     - spec/**/*
+
+Metrics/CyclomaticComplexity:
+  Max: 8
+
+Metrics/PerceivedComplexity:
+  Max: 8
