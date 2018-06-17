@@ -29,6 +29,14 @@ module PdfMage
 
         `#{CONFIG.chrome_exe} --headless --disable-gpu --print-to-pdf=#{pdf_filename(pdf_id)} #{url_with_secret}`
 
+        if CONFIG.optimize_pdf_size
+          `
+            mv #{pdf_filename(pdf_id)} #{pdf_filename(pdf_id)}.large;
+            ps2pdf #{pdf_filename(pdf_id)}.large #{pdf_filename(pdf_id)};
+            rm #{pdf_filename(pdf_id)}.large;
+          `
+        end
+
         unless $CHILD_STATUS.exitstatus.zero?
           raise "Error executing chrome PDF export. Status: [#{$CHILD_STATUS.exitstatus}]"
         end

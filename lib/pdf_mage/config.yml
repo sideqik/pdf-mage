@@ -7,4 +7,5 @@ aws_presigned_url_duration: 600
 chrome_exe: chrome
 delete_file_on_upload: true
 log_level: 'info'
+optimize_pdf_size: false
 pdf_directory: 'pdfs'
