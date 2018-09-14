@@ -9,3 +9,8 @@ delete_file_on_upload: true
 log_level: 'info'
 optimize_pdf_size: false
 pdf_directory: 'pdfs'
+# Render configurations
+#configs:
+#  javascript_render:
+#    run_all_compositor_stages_before_draw: true
+#    virtual_time_budget: 10000

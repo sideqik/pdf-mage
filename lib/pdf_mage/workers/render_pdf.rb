@@ -12,7 +12,7 @@ module PdfMage
     # processing or uploading to Amazon S3.
     # @since 0.1.0
     class RenderPdf < PdfMage::Workers::Base
-      def perform(website_url, callback_url = nil, filename = nil, meta = nil)
+      def perform(website_url, callback_url = nil, filename = nil, meta = nil, config = nil)
         LOGGER.info "Rendering [#{website_url}] with callback [#{callback_url}] and meta: #{meta.inspect}"
 
         stripped_filename = strip_string(filename)
@@ -27,7 +27,7 @@ module PdfMage
         ensure_directory_exists_for_pdf(pdf_filename(pdf_id))
         url_with_secret = secretize_url(website_url)
 
-        `#{CONFIG.chrome_exe} --headless --disable-gpu --print-to-pdf=#{pdf_filename(pdf_id)} #{url_with_secret}`
+        `#{build_command(pdf_filename(pdf_id), url_with_secret, config)}`
 
         if CONFIG.optimize_pdf_size
           `
@@ -48,6 +48,26 @@ module PdfMage
         elsif string_exists?(callback_url)
           PdfMage::Workers::SendWebhook.perform_async(pdf_filename(pdf_id), callback_url, meta)
         end
+      end
+
+      def build_command(pdf_filename, url, config = nil)
+        cmd_args = %w[
+          --headless
+          --disable-gpu
+        ]
+        if config && (render_config = CONFIG.configs[config])
+          LOGGER.info "Loading render configuration: #{config}"
+          LOGGER.debug render_config.inspect
+          if render_config['run_all_compositor_stages_before_draw']
+            cmd_args << '--run-all-compositor-stages-before-draw'
+          end
+          if (budget = render_config['virtual_time_budget'])
+            cmd_args << "--virtual-time-budget=#{budget}"
+          end
+        end
+        cmd_args << "--print-to-pdf=#{pdf_filename}"
+        cmd_args << url
+        "#{CONFIG.chrome_exe} #{cmd_args.join(' ')}"
       end
     end
   end

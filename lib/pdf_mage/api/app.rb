@@ -31,8 +31,9 @@ module PdfMage
         callback_url = params[:callback_url]
         filename = params[:filename]
         meta = params[:meta]
+        config = params[:config]
 
-        job_id = PdfMage::Workers::RenderPdf.perform_async(url, callback_url, filename, meta)
+        job_id = PdfMage::Workers::RenderPdf.perform_async(url, callback_url, filename, meta, config)
         { result: 'ok', job_id: job_id }.to_json
       end
 
