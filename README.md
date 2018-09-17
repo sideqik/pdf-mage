@@ -31,6 +31,12 @@ Finally, run the setup command:
 bin/setup
 ```
 
+On MacOSX, the `ps2pdf` command must be available.  To install via Homebrew:
+
+```sh
+brew install ghostscript
+```
+
 ## Running the Server
 
 To run the server, you need to turn run both the API and the Sidekiq job server. If running in production, make sure to enable the environment flag for it, or else it'll default to the development environment.
