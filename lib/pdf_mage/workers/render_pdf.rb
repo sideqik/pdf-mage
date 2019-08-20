@@ -51,23 +51,7 @@ module PdfMage
       end
 
       def build_command(pdf_filename, url, config = nil)
-        cmd_args = %w[
-          --headless
-          --disable-gpu
-        ]
-        if config && (render_config = CONFIG.configs[config])
-          LOGGER.info "Loading render configuration: #{config}"
-          LOGGER.debug render_config.inspect
-          if render_config['run_all_compositor_stages_before_draw']
-            cmd_args << '--run-all-compositor-stages-before-draw'
-          end
-          if (budget = render_config['virtual_time_budget'])
-            cmd_args << "--virtual-time-budget=#{budget}"
-          end
-        end
-        cmd_args << "--print-to-pdf=#{pdf_filename}"
-        cmd_args << url
-        "#{CONFIG.chrome_exe} #{cmd_args.join(' ')}"
+        "node ./print-to-pdf/index.js --path=\"#{pdf_filename}\" --url=\"#{url}\""
       end
     end
   end
