@@ -3,6 +3,7 @@ const argv = require('yargs').argv;
 
 let url = argv.url;
 let path = argv.path;
+let safetySeconds = argv.delay;
 let format = argv.format || 'Letter';
 
 // https://github.com/GoogleChrome/puppeteer/issues/1353#issuecomment-356561654
@@ -54,6 +55,8 @@ function delay(timeout) {
     waitForNetworkIdle(page, 3000),
     page.goto(url),
   ]);
+
+  await delay(safetySeconds * 1000);
 
   await page.pdf({ path, format, printBackground: true });
   await browser.close();
