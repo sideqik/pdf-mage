@@ -51,7 +51,11 @@ module PdfMage
       end
 
       def build_command(pdf_filename, url, config = nil)
-        "node ./print-to-pdf/index.js --path=\"#{pdf_filename}\" --url=\"#{url}\""
+        config ||= {}
+
+        delay = config.dig('delay')
+
+        "node ./print-to-pdf/index.js --path=\"#{pdf_filename}\" --url=\"#{url}\" --delay=\"#{delay.nil? ? 0 : delay.to_i}\""
       end
     end
   end
