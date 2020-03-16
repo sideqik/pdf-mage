@@ -51,7 +51,7 @@ module PdfMage
       end
 
       def build_command(pdf_filename, url, config = nil)
-        config ||= {}
+        config = {} unless config.class == Hash
 
         delay = config.dig('delay')
 
