@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-bundle exec sidekiq -r ./lib/pdf_mage_workers.rb -q pdfmage
+bundle exec sidekiq -r ./lib/pdf_mage_workers.rb -q pdfmage -c $SIDEKIQ_CONCURRENCY
