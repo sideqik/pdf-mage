@@ -50,12 +50,13 @@ module PdfMage
         end
       end
 
-      def build_command(pdf_filename, url, config = nil)
+      def build_command(pdf_filename, url, config=nil)
         config = {} unless config.class == Hash
 
         delay = config.dig('delay')
+        scale = config.dig('scale')
 
-        "node ./print-to-pdf/index.js --path=\"#{pdf_filename}\" --url=\"#{url}\" --delay=\"#{delay.nil? ? 0 : delay.to_i}\""
+        "node ./print-to-pdf/index.js --path=\"#{pdf_filename}\" --url=\"#{url}\" --delay=\"#{delay.nil? ? 0 : delay.to_i}\" --scale=\"#{scale.nil? ? 1 : scale.to_f}\""
       end
     end
   end

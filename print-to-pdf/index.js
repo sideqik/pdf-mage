@@ -5,6 +5,7 @@ let url = argv.url;
 let path = argv.path;
 let safetySeconds = argv.delay;
 let format = argv.format || 'Letter';
+let scale = parseFloat(argv.scale) || 1;
 
 // https://github.com/GoogleChrome/puppeteer/issues/1353#issuecomment-356561654
 function waitForNetworkIdle(page, timeout, maxInflightRequests = 0) {
@@ -58,6 +59,6 @@ function delay(timeout) {
 
   await delay(safetySeconds * 1000);
 
-  await page.pdf({ path, format, printBackground: true });
+  await page.pdf({ path, format, scale, printBackground: true });
   await browser.close();
 })();
