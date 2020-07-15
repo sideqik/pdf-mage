@@ -32,7 +32,7 @@ module PdfMage
         if CONFIG.optimize_pdf_size
           `
             mv #{pdf_filename(pdf_id)} #{pdf_filename(pdf_id)}.large;
-            ps2pdf #{pdf_filename(pdf_id)}.large #{pdf_filename(pdf_id)};
+            ghostscript -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/printer -dNOPAUSE -dQUIET -dBATCH -sOutputFile=#{pdf_filename(pdf_id)} #{pdf_filename(pdf_id)}.large
             rm #{pdf_filename(pdf_id)}.large;
           `
         end
