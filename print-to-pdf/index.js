@@ -1,11 +1,15 @@
 const puppeteer = require('puppeteer');
 const argv = require('yargs').argv;
+const Promise = require('bluebird');
 
 let url = argv.url;
 let path = argv.path;
 let safetySeconds = argv.delay;
 let format = argv.format || 'Letter';
 let scale = parseFloat(argv.scale) || 1;
+
+const TIME_SINCE_LAST_REQUEST = 3000;
+const MAX_RENDER_WAIT = 15000;
 
 // https://github.com/GoogleChrome/puppeteer/issues/1353#issuecomment-356561654
 function waitForNetworkIdle(page, timeout, maxInflightRequests = 0) {
@@ -53,7 +57,13 @@ function delay(timeout) {
   await page.setViewport({ width: 1250, height: 1650 }); // by trial-and-error, this makes charts render at the right width
 
   await Promise.all([
-    waitForNetworkIdle(page, 3000),
+    // IF a) all requests have resolved an no new requests have been made in 3 seconds, OR
+    //    b) 15 seconds have elapsed
+    // THEN move on to rendering to PDF
+    Promise.any([
+      new Promise(resolve => setTimeout(resolve, MAX_RENDER_WAIT)),
+      waitForNetworkIdle(page, TIME_SINCE_LAST_REQUEST),
+    ]),
     page.goto(url),
   ]);
 
