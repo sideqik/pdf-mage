@@ -65,10 +65,10 @@ function delay(timeout) {
       waitForNetworkIdle(page, TIME_SINCE_LAST_REQUEST),
     ]),
     page.goto(url),
-  ]);
+  ]).catch(() => process.exit(1));
 
   await delay(safetySeconds * 1000);
 
-  await page.pdf({ path, format, scale, printBackground: true });
+  await page.pdf({ path, format, scale, printBackground: true }).catch(() => process.exit(1));
   await browser.close();
 })();
