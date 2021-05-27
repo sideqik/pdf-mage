@@ -11,6 +11,7 @@ module PdfMage
     # @since 0.1.0
     class App < Sinatra::Base
       set :environment, :production
+      SUPPORTED_TYPES = ['pdf', 'pptx']
 
       before do
         content_type :json
@@ -32,8 +33,14 @@ module PdfMage
         filename = params[:filename]
         meta = params[:meta]
         config = params[:config]
+        type = params[:type]
 
-        job_id = PdfMage::Workers::RenderPdf.perform_async(url, callback_url, filename, meta, config)
+        validate_file_type(type)
+        job_id = PdfMage::Workers::RenderPdf.perform_async(
+          url, type, callback_url, filename,
+          meta, config
+        )
+
         { result: 'ok', job_id: job_id }.to_json
       end
 
@@ -50,6 +57,12 @@ module PdfMage
         value = params[key]
         error(422, "Required parameter '#{key}' is missing") unless value && !value.empty?
         value
+      end
+
+      private
+
+      def validate_file_type(type)
+        raise 'Unsupported file type #{type}' unless SUPPORTED_TYPES.include?(type)
       end
     end
   end

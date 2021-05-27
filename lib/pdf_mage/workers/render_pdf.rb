@@ -3,7 +3,8 @@
 require 'English'
 require_relative 'base'
 require_relative 'send_webhook'
-require_relative 'upload_file'
+require_relative 'upload_pdf'
+require_relative 'render_pptx'
 require 'securerandom'
 
 module PdfMage
@@ -12,28 +13,24 @@ module PdfMage
     # processing or uploading to Amazon S3.
     # @since 0.1.0
     class RenderPdf < PdfMage::Workers::Base
-      def perform(website_url, callback_url = nil, filename = nil, meta = nil, config = nil)
-        LOGGER.info "Rendering [#{website_url}] with callback [#{callback_url}] and meta: #{meta.inspect}"
+      def perform(website_url, final_format, callback_url, filename, meta, config)
 
-        stripped_filename = strip_string(filename)
-        stripped_filename_present = string_exists?(stripped_filename)
+        LOGGER.info "Rendering [#{website_url}] with callback [#{callback_url}] and meta: #{meta.inspect} and final format: #{final_format}"
 
-        # If a filename exists and the stripped version causes the string to be empty, warn about it in the logs.
-        if filename && !stripped_filename_present
-          LOGGER.warn "'#{filename}' is not a valid ASCII string, falling back to UUID for PDF name."
-        end
+        export_id = meta['export_id'] || SecureRandom.uuid
+        LOGGER.info "[RenderPdf] generated export id #{export_id} ..."
 
-        pdf_id = stripped_filename_present ? stripped_filename : SecureRandom.uuid
-        ensure_directory_exists_for_pdf(pdf_filename(pdf_id))
+        ensure_directory_exists_for_pdf(pdf_filename(export_id))
         url_with_secret = secretize_url(website_url)
 
-        `#{build_command(pdf_filename(pdf_id), url_with_secret, config)}`
+        LOGGER.info "[RenderPdf] writing to file #{pdf_filename(export_id)}..."
+        `#{build_command(pdf_filename(export_id), url_with_secret, config)}`
 
         if CONFIG.optimize_pdf_size
           `
-            mv #{pdf_filename(pdf_id)} #{pdf_filename(pdf_id)}.large;
-            gs -sDEVICE=pdfwrite -dSAFER -dBATCH -dNOPAUSE -o #{pdf_filename(pdf_id)} -f #{pdf_filename(pdf_id)}.large
-            rm #{pdf_filename(pdf_id)}.large;
+            mv #{pdf_filename(export_id)} #{pdf_filename(export_id)}.large;
+            gs -sDEVICE=pdfwrite -dSAFER -dBATCH -dNOPAUSE -o #{pdf_filename(export_id)} -f #{pdf_filename(export_id)}.large
+            rm #{pdf_filename(export_id)}.large;
           `
         end
 
@@ -41,12 +38,14 @@ module PdfMage
           raise "Error executing chrome PDF export. Status: [#{$CHILD_STATUS.exitstatus}]"
         end
 
-        LOGGER.info "Rendered PDF [#{pdf_id}] with status [#{$CHILD_STATUS.exitstatus}]"
+        LOGGER.info "Rendered PDF [#{export_id}] with status [#{$CHILD_STATUS.exitstatus}]"
 
-        if CONFIG.aws_account_key
-          PdfMage::Workers::UploadFile.perform_async(pdf_id, callback_url, meta)
-        elsif string_exists?(callback_url)
-          PdfMage::Workers::SendWebhook.perform_async(pdf_filename(pdf_id), callback_url, meta)
+        if final_format == 'pptx'
+          PdfMage::Workers::RenderPptx.perform_async(export_id, callback_url, meta)
+        elsif final_format == 'pdf'
+          PdfMage::Workers::UploadPdf.perform_async(export_id, callback_url, meta)
+        else
+          raise ArgumentError, "unrecognized final format `#{final_format}`"
         end
       end
 

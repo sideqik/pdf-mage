@@ -1,15 +1,16 @@
+# coding: utf-8
 # frozen_string_literal: true
 
-require 'pdf_mage/workers/upload_file'
+require 'pdf_mage/workers/upload_pdf'
 
-RSpec.describe PdfMage::Workers::UploadFile do
+RSpec.describe PdfMage::Workers::UploadPdf do
   describe '#perform' do
     let(:callback_url) { nil }
     let(:meta) { nil }
     let(:pdf_id) { 'example' }
 
     subject do
-      PdfMage::Workers::UploadFile.perform_async(pdf_id, callback_url, meta)
+      PdfMage::Workers::UploadPdf.perform_async(pdf_id, callback_url, meta)
     end
 
     it 'creates the bucket on S3' do
@@ -66,16 +67,6 @@ RSpec.describe PdfMage::Workers::UploadFile do
     context 'when aws_account_bucket is missing' do
       before do
         allow(CONFIG).to receive(:aws_account_bucket).and_return(nil)
-      end
-
-      it 'raises an error' do
-        expect { subject }.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'when aws_presigned_url_duration is missing' do
-      before do
-        allow(CONFIG).to receive(:aws_presigned_url_duration).and_return(nil)
       end
 
       it 'raises an error' do

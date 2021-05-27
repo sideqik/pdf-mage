@@ -1,3 +1,4 @@
+# coding: utf-8
 # frozen_string_literal: true
 
 require 'fileutils'
@@ -84,18 +85,6 @@ RSpec.describe PdfMage::Workers::Base do
     let(:pdf_id) { 'cool' }
     subject { super().pdf_filename(pdf_id) }
 
-    context 'when cached filename exists' do
-      subject do
-        base_job = PdfMage::Workers::Base.new
-        base_job.instance_variable_set(:@filename, 'wacky')
-        base_job.pdf_filename(pdf_id)
-      end
-
-      it 'returns the cached filename' do
-        expect(subject).to eq('wacky')
-      end
-    end
-
     context 'when pdf_id does not end with .pdf' do
       it 'appends .pdf to it' do
         expect(subject).to eq('pdfs/cool.pdf')
@@ -116,9 +105,46 @@ RSpec.describe PdfMage::Workers::Base do
       end
     end
 
-    context 'when pdf_directory is not present' do
+    context 'when export_directory is not present' do
       before do
-        allow(CONFIG).to receive(:pdf_directory).and_return('')
+        allow(CONFIG).to receive(:export_directory).and_return('')
+      end
+
+      it 'raises an error' do
+        expect { subject }.to raise_error(ArgumentError)
+      end
+    end
+  end
+
+  describe '#pptx_filename' do
+    subject { super().pptx_filename(export_id) }
+
+    context 'when export_id does not end with .pptx' do
+      let(:export_id) { 'cool' }
+      it 'appends .pptx to it' do
+        expect(subject).to eq('pdfs/cool.pptx')
+      end
+    end
+
+    context 'when export_id ends with .pptx' do
+      let(:export_id) { 'cool.pptx' }
+      it 'does not append an extra .pptx' do
+        expect(subject).to eq('pdfs/cool.pptx')
+      end
+    end
+
+    context 'when export_id is not present' do
+      let(:export_id) { nil }
+      it 'raises an error' do
+        expect { subject }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'when export_directory is not present' do
+      let(:export_id) { 'cool' }
+
+      before do
+        allow(CONFIG).to receive(:export_directory).and_return('')
       end
 
       it 'raises an error' do
