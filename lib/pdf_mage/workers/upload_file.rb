@@ -3,16 +3,17 @@
 require_relative 'base'
 require_relative 'send_webhook'
 require_relative '../convert_api'
+require_relative '../aws_helpers'
 require 'aws-sdk-s3'
 require 'open-uri'
 
 module PdfMage
   module Workers
-    class UploadPptx < PdfMage::Workers::Base
+    class UploadFile < PdfMage::Workers::Base
       include AwsHelpers
 
-      def perform(export_id, callback_url = nil, meta = nil)
-        LOGGER.info "Uploading pptx file [#{pptx_filename(export_id)}] with callback [#{callback_url}] and meta: #{meta.inspect}}"
+      def perform(filename, callback_url = nil, meta = nil)
+        LOGGER.info "Uploading file [#{filename}] with callback [#{callback_url}] and meta: #{meta.inspect}}"
 
         validate_aws_config!
 
@@ -22,15 +23,12 @@ module PdfMage
           secret_access_key: CONFIG.aws_account_secret
         )
 
-        s3_key = pptx_filename(export_id)
-        obj = s3.bucket(CONFIG.aws_account_bucket).object(pptx_filename(export_id))
-        obj.upload_file(pptx_filename(export_id))
-
-        LOGGER.info "called bucket.object with argument #{export_id}"
-        LOGGER.info "called obj.upload_file with argument #{pptx_filename(export_id)}"
+        s3_key = filename
+        obj = s3.bucket(CONFIG.aws_account_bucket).object(filename)
+        obj.upload_file(filename)
 
         if CONFIG.delete_file_on_upload
-          `rm #{pptx_filename(export_id)}`
+          `rm #{filename}`
         end
 
         if string_exists?(callback_url)

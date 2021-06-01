@@ -32,7 +32,7 @@ module PdfMage
         LOGGER.info "Rendered PPTX [#{pptx_filename(export_id)}] for PDF [#{export_id}]"
 
         if CONFIG.aws_account_key
-          PdfMage::Workers::UploadPptx.perform_async(export_id, callback_url, meta)
+          PdfMage::Workers::UploadFile.perform_async(pptx_filename(export_id), callback_url, meta)
         elsif string_exists?(callback_url)
           PdfMage::Workers::SendWebhook.perform_async(pptx_filename(export_id), callback_url, meta)
         end

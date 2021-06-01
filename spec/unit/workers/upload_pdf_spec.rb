@@ -1,16 +1,16 @@
 # coding: utf-8
 # frozen_string_literal: true
 
-require 'pdf_mage/workers/upload_pdf'
+require 'pdf_mage/workers/upload_file'
 
-RSpec.describe PdfMage::Workers::UploadPdf do
+RSpec.describe PdfMage::Workers::UploadFile do
   describe '#perform' do
     let(:callback_url) { nil }
     let(:meta) { nil }
     let(:pdf_id) { 'example' }
 
     subject do
-      PdfMage::Workers::UploadPdf.perform_async(pdf_id, callback_url, meta)
+      PdfMage::Workers::UploadFile.perform_async(pdf_id, callback_url, meta)
     end
 
     it 'creates the bucket on S3' do

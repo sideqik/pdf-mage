@@ -3,7 +3,7 @@
 require 'English'
 require_relative 'base'
 require_relative 'send_webhook'
-require_relative 'upload_pdf'
+require_relative 'upload_file'
 require_relative 'render_pptx'
 require 'securerandom'
 
@@ -43,7 +43,7 @@ module PdfMage
         if final_format == 'pptx'
           PdfMage::Workers::RenderPptx.perform_async(export_id, callback_url, meta)
         elsif final_format == 'pdf'
-          PdfMage::Workers::UploadPdf.perform_async(export_id, callback_url, meta)
+          PdfMage::Workers::UploadFile.perform_async(pdf_filename(export_id), callback_url, meta)
         else
           raise ArgumentError, "unrecognized final format `#{final_format}`"
         end
