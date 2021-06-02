@@ -3,19 +3,14 @@
 require_relative 'base'
 require_relative 'send_webhook'
 require_relative '../convert_api'
-require_relative '../aws_helpers'
 require 'aws-sdk-s3'
 require 'open-uri'
 
 module PdfMage
   module Workers
     class UploadFile < PdfMage::Workers::Base
-      include AwsHelpers
-
       def perform(filename, callback_url = nil, meta = nil)
         LOGGER.info "Uploading file [#{filename}] with callback [#{callback_url}] and meta: #{meta.inspect}}"
-
-        validate_aws_config!
 
         s3 = Aws::S3::Resource.new(
           access_key_id: CONFIG.aws_account_key,
