@@ -15,7 +15,7 @@ module ConvertApi
       UPLOAD_URL,
       method: :post,
       params: {
-        'Secret' => 'jjlOQjqI7Nl2nY8d'#CONFIG['convertapi_secret']
+        'Secret' => CONFIG['convertapi_secret']
       },
       headers: {
         'Content-Disposition' => "inline; filename=\"#{filename}\""
@@ -33,8 +33,7 @@ module ConvertApi
     url = CONVERT_PATTERN.
             gsub(':from', from).
             gsub(':to', to).
-            gsub(':secret', 'jjlOQjqI7Nl2nY8d').
-            #gsub(':secret', CONFIG['convertapi_secret']).
+            gsub(':secret', CONFIG['convertapi_secret']).
             gsub(':file_id', file_id)
     response = Typhoeus.post(url)
 
