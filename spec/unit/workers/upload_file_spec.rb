@@ -1,9 +1,8 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'pdf_mage/workers/upload_file'
 
-RSpec.describe PdfMage::Workers::UploadFile do
+RSpec.describe PdfMage::Workers:: UploadFile do
   describe '#perform' do
     let(:callback_url) { nil }
     let(:meta) { nil }
