@@ -20,7 +20,22 @@ module PdfMage
 
         s3_key = filename
         obj = s3.bucket(CONFIG.aws_account_bucket).object(filename)
-        obj.upload_file(filename)
+        file_extension = filename.split('.')[-1]
+        content_type = case file_extension
+                       when 'pdf'
+                         'application/pdf'
+                       when 'pptx'
+                         'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                       end
+        download_filename = "Sideqik Export.#{file_extension}"
+
+        File.open(filename) do |file|
+          obj.put(
+            content_type: content_type,
+            content_disposition: "attachment; filename=\"#{download_filename}\"",
+            body: file
+          )
+        end
 
         if CONFIG.delete_file_on_upload
           `rm #{filename}`
