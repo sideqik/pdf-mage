@@ -1,24 +1,24 @@
 module PdfMage
   module AwsHelpers
 
-    def validate_aws_config!
-        unless string_exists?(CONFIG.aws_account_key)
-          raise ArgumentError, 'You must define aws_account_key in your config file'
-        end
+    def self.validate_aws_config!
+      if !CONFIG.aws_account_key || CONFIG.aws_account_key.empty?
+        raise ArgumentError, 'You must define aws_account_key in your config file'
+      end
 
-        unless string_exists?(CONFIG.aws_account_secret)
-          raise ArgumentError, 'You must define aws_account_secret in your config file'
-        end
+      if !CONFIG.aws_account_secret || CONFIG.aws_account_secret.empty?
+        raise ArgumentError, 'You must define aws_account_secret in your config file'
+      end
 
-        unless string_exists?(CONFIG.aws_account_region)
-          raise ArgumentError, 'You must define aws_account_region in your config file'
-        end
+      if !CONFIG.aws_account_region || CONFIG.aws_account_region.empty?
+        raise ArgumentError, 'You must define aws_account_region in your config file'
+      end
 
-        unless string_exists?(CONFIG.aws_account_bucket)
-          raise ArgumentError, 'You must define aws_account_bucket in your config file'
-        end
+      if !CONFIG.aws_account_bucket || CONFIG.aws_account_bucket.empty?
+        raise ArgumentError, 'You must define aws_account_bucket in your config file'
+      end
 
-        true
+      true
     end
   end
 end

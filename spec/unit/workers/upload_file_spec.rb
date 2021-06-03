@@ -1,3 +1,4 @@
+# coding: utf-8
 # frozen_string_literal: true
 
 require 'pdf_mage/workers/upload_file'
@@ -30,46 +31,6 @@ RSpec.describe PdfMage::Workers:: UploadFile do
       end
 
       it 'leaves the file in place' do
-      end
-    end
-
-    context 'when aws_account_key is missing' do
-      before do
-        allow(CONFIG).to receive(:aws_account_key).and_return(nil)
-      end
-
-      it 'raises an error' do
-        expect { subject }.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'when aws_account_secret is missing' do
-      before do
-        allow(CONFIG).to receive(:aws_account_secret).and_return(nil)
-      end
-
-      it 'raises an error' do
-        expect { subject }.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'when aws_account_region is missing' do
-      before do
-        allow(CONFIG).to receive(:aws_account_region).and_return(nil)
-      end
-
-      it 'raises an error' do
-        expect { subject }.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'when aws_account_bucket is missing' do
-      before do
-        allow(CONFIG).to receive(:aws_account_bucket).and_return(nil)
-      end
-
-      it 'raises an error' do
-        expect { subject }.to raise_error(ArgumentError)
       end
     end
   end
