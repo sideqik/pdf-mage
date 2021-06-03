@@ -2,15 +2,15 @@
 
 require_relative 'base'
 require_relative 'send_webhook'
+require_relative '../convert_api'
 require 'aws-sdk-s3'
+require 'open-uri'
 
 module PdfMage
   module Workers
-    # A Sidekiq job that uploads a rendered PDF to Amazon S3.
-    # @since 0.1.0
     class UploadFile < PdfMage::Workers::Base
-      def perform(pdf_id, callback_url = nil, meta = nil)
-        validate_aws_config!
+      def perform(filename, callback_url = nil, meta = nil)
+        LOGGER.info "Uploading file [#{filename}] with callback [#{callback_url}] and meta: #{meta.inspect}}"
 
         s3 = Aws::S3::Resource.new(
           access_key_id: CONFIG.aws_account_key,
@@ -18,39 +18,33 @@ module PdfMage
           secret_access_key: CONFIG.aws_account_secret
         )
 
-        obj = s3.bucket(CONFIG.aws_account_bucket).object(pdf_id)
-        obj.upload_file(pdf_filename(pdf_id))
-        pdf_url = obj.presigned_url(:get, expires_in: CONFIG.aws_presigned_url_duration)
+        s3_key = filename
+        obj = s3.bucket(CONFIG.aws_account_bucket).object(filename)
+        file_extension = filename.split('.')[-1]
+        content_type = case file_extension
+                       when 'pdf'
+                         'application/pdf'
+                       when 'pptx'
+                         'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                       end
+        download_filename = "Sideqik Export.#{file_extension}"
 
-        `rm #{pdf_filename(pdf_id)}` if CONFIG.delete_file_on_upload
-        PdfMage::Workers::SendWebhook.perform_async(pdf_url, callback_url, meta) if string_exists?(callback_url)
-      end
-
-      private
-
-      # Checks for the present of all necessary AWS config options.
-      def validate_aws_config!
-        unless string_exists?(CONFIG.aws_account_key)
-          raise ArgumentError, 'You must define aws_account_key in your config file to upload PDFs.'
+        File.open(filename) do |file|
+          obj.put(
+            content_type: content_type,
+            content_disposition: "attachment; filename=\"#{download_filename}\"",
+            body: file
+          )
         end
 
-        unless string_exists?(CONFIG.aws_account_secret)
-          raise ArgumentError, 'You must define aws_account_secret in your config file to upload PDFs.'
+        if CONFIG.delete_file_on_upload
+          `rm #{filename}`
         end
 
-        unless string_exists?(CONFIG.aws_account_region)
-          raise ArgumentError, 'You must define aws_account_region in your config file to upload PDFs.'
+        if string_exists?(callback_url)
+          LOGGER.info("Sending webhook to callback...")
+          PdfMage::Workers::SendWebhook.perform_async(s3_key, callback_url, meta)
         end
-
-        unless string_exists?(CONFIG.aws_account_bucket)
-          raise ArgumentError, 'You must define aws_account_bucket in your config file to upload PDFs.'
-        end
-
-        if CONFIG.aws_presigned_url_duration.nil?
-          raise ArgumentError, 'You must define aws_presigned_url_duration in your config file to upload PDFs.'
-        end
-
-        true
       end
     end
   end

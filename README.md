@@ -59,11 +59,10 @@ Create a config.yml.local file and overwrite any of the following properties:
 | aws_account_bucket | String | Bucket to upload PDFs into
 | aws_account_region | String | Region to upload PDFs into
 | aws_account_secret | String | Secret in your AWS S3 API credentials
-| aws_presigned_url_duration | Integer | How long the returned URL in the presigned-request should exist for, in seconds
 | chrome_exe | String | Path to the Chrome executable
 | delete_file_on_upload | Boolean | Whether or not to delete PDFs after they're uploaded
 | log_level | String | What level of logs to write to the logfile
-| pdf_directory | String | Where to locally store PDFs
+| export_directory | String | Where to locally store exported files
 
 Then, when starting the server, pass `CONFIG_FILE=config.yml.local`.
 
@@ -78,9 +77,9 @@ If you use the API secret config option, you can add security to your applicatio
 
 1. Require you to pass a "secret" param with every request to PDF Mage's render resource, where the value is the secret set in the config.
 2. Request the website url you want PDF Mage to render with a "secret" parameter, with the value you set in the config.
-3. Sign the webhook sent to your server with a SHA256 hexdigest as a "X-Pdf-Signature" header. See info about checking the signature below.
+3. Sign the webhook sent to your server with a SHA256 hexdigest as an "X-Export-Signature" header. See info about checking the signature below.
 
-**To check the X-Pdf-Signature header:**
+**To check the X-Export-Signature header:**
 
 1. Create a SHA256 HMAC hexdigest using the config secret as the key and the response body as the data.
 2. Compare the hexdigest to the signature provided.
@@ -92,7 +91,7 @@ If you use the API secret config option, you can add security to your applicatio
 valid_signature = OpenSSL::HMAC.hexdigest('sha256', CONFIG.api_secret, response.body)
 
 # Compare the signatures
-response.headers['X-Pdf-Signature'] == valid_signature
+response.headers['X-Export-Signature'] == valid_signature
 ```
 
 ## Development

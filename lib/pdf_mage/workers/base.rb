@@ -40,28 +40,51 @@ module PdfMage
       # Generates a filename for a unique PDF identifier using the pdf directory specified in the config and the given
       # pdf id.
       #
-      # @param [String] pdf_id - PDF identifier to make filename from
+      # @param [String] export_id - Export identifier to make filename from
       # @return [String] filename to store PDF at
       #
-      # @raise [ArgumentError] if pdf_id is nil or an empty string
-      # @raise [ArgumentError] if CONFIG.pdf_directory is nil or an empty string
-      def pdf_filename(pdf_id)
-        return @filename if defined?(@filename)
-
-        unless string_exists?(pdf_id)
-          raise ArgumentError, 'pdf_id must be a string that includes at least 1 ASCII character.'
+      # @raise [ArgumentError] if export_id is nil or an empty string
+      # @raise [ArgumentError] if CONFIG.export_directory is nil or an empty string
+      def pdf_filename(export_id)
+        unless string_exists?(export_id)
+          raise ArgumentError, 'export_id must be a string that includes at least 1 ASCII character.'
         end
 
-        unless string_exists?(CONFIG.pdf_directory)
+        unless string_exists?(CONFIG.export_directory)
           raise ArgumentError, '
-            The pdf_directory in your config.yml must be a string that includes at least 1 ASCII character.
+            The export_directory in your config.yml must be a string that includes at least 1 ASCII character.
           '
         end
 
-        filename = "#{CONFIG.pdf_directory}/#{pdf_id}"
-        filename += '.pdf' unless pdf_id.end_with?('.pdf')
+        filename = "#{CONFIG.export_directory}/#{export_id}"
+        filename += '.pdf' unless export_id.end_with?('.pdf')
 
-        @filename = filename
+        filename
+      end
+
+      # Generates a filename for a unique PPTX identifier using the exports directory specified in the config and the given
+      # export id.
+      #
+      # @param [String] export_id - Export identifier to make filename from
+      # @return [String] filename to store PPTX at
+      #
+      # @raise [ArgumentError] if export_id is nil or an empty string
+      # @raise [ArgumentError] if CONFIG.export_directory is nil or an empty string
+      def pptx_filename(export_id)
+        unless string_exists?(export_id)
+          raise ArgumentError, 'export_id must be a string that includes at least 1 ASCII character.'
+        end
+
+        unless string_exists?(CONFIG.export_directory)
+          raise ArgumentError, '
+            The export_directory in your config.yml must be a string that includes at least 1 ASCII character.
+          '
+        end
+
+        filename = "#{CONFIG.export_directory}/#{export_id}"
+        filename += '.pptx' unless export_id.end_with?('.pptx')
+
+        filename
       end
 
       # Adds the API secret to a URL.
