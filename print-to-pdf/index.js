@@ -72,3 +72,4 @@ function delay(timeout) {
   await page.pdf({ path, format, scale, printBackground: true }).catch(() => process.exit(1));
   await browser.close();
 })();
+

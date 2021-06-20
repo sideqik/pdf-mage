@@ -24,7 +24,9 @@ module PdfMage
         url_with_secret = secretize_url(website_url)
 
         LOGGER.info "[RenderPdf] writing to file #{pdf_filename(export_id)}..."
-        `#{build_command(pdf_filename(export_id), url_with_secret, config)}`
+	cmd = build_command(pdf_filename(export_id), url_with_secret, config)
+        LOGGER.info "[RenderPdf] running command: #{cmd}"
+        `#{cmd}`
 
         if CONFIG.optimize_pdf_size
           `
@@ -55,7 +57,7 @@ module PdfMage
         delay = config.dig('delay')
         scale = config.dig('scale')
 
-        "node ./print-to-pdf/index.js --path=\"#{pdf_filename}\" --url=\"#{url}\" --delay=\"#{delay.nil? ? 0 : delay.to_i}\" --scale=\"#{scale.nil? ? 1 : scale.to_f}\""
+        "node /home/ubuntu/pdf-mage/print-to-pdf/index.js --path=\"#{pdf_filename}\" --url=\"#{url}\" --delay=\"#{delay.nil? ? 0 : delay.to_i}\" --scale=\"#{scale.nil? ? 1 : scale.to_f}\""
       end
     end
   end

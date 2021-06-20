@@ -1,5 +1,5 @@
 #!/bin/bash
-APP_NAME=pdf-mage-sidekiq
+APP_NAME=pdf-mage-api
 APP_ROOT=$HOME/pdf-mage
 PID_FILE=/var/run/sideqik/$APP_NAME.pid
 LOG_FILE=/var/pdfs/log/$APP_NAME.log
@@ -7,7 +7,7 @@ LOG_FILE=/var/pdfs/log/$APP_NAME.log
 start() {
   cd $APP_ROOT
   echo "Starting $APP_NAME..."
-  bundle exec sidekiq -r $APP_ROOT/lib/pdf_mage_workers.rb -q pdfmage -c $SIDEKIQ_CONCURRENCY > $LOG_FILE 2>&1 &
+  ./bin/pdf_mage > $LOG_FILE 2>&1 &
   echo $! > $PID_FILE
   RETVAL=$?
 }
@@ -32,5 +32,3 @@ case $1 in
       echo "usage: $PROCESS_NAME {start|stop|restart}" ;;
 esac
 exit $RETVAL
-
-
