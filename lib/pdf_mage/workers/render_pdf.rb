@@ -57,7 +57,9 @@ module PdfMage
         delay = config.dig('delay')
         scale = config.dig('scale')
 
-        "node ./print-to-pdf/index.js --path=\"#{pdf_filename}\" --url=\"#{url}\" --delay=\"#{delay.nil? ? 0 : delay.to_i}\" --scale=\"#{scale.nil? ? 1 : scale.to_f}\""
+        dir = ENV['PDFMAGE_ENV'] == 'production' ? '/home/ubuntu/pdf-mage' : '.'
+
+        "node #{dir}/print-to-pdf/index.js --path=\"#{pdf_filename}\" --url=\"#{url}\" --delay=\"#{delay.nil? ? 0 : delay.to_i}\" --scale=\"#{scale.nil? ? 1 : scale.to_f}\""
       end
     end
   end
