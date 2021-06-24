@@ -60,7 +60,7 @@ function delay(timeout) {
 (async () => {
 	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
-	await page.setViewport({ width: width - 1 , height: height - 1 });
+	await page.setViewport({ width: width, height: height });
 
 	await Promise.all([
 		// IF a) all requests have resolved an no new requests have been made in 3 seconds, OR
