@@ -11,5 +11,6 @@
 *.local
 *.local.yml
 *.log
+*.pid
 /spec/examples.txt
 node_modules/

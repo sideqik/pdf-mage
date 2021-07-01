@@ -1,8 +1,16 @@
 #!/bin/bash
+
+BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+APP_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# These are usually overridden in .bashrc in production
+PDFMAGE_PID_DIR="${PDFMAGE_PID_DIR:-$APP_ROOT}"
+PDFMAGE_LOG_DIR="${PDFMAGE_LOG_DIR:-$APP_ROOT}"
+
+# Usually you don't edit these
 APP_NAME=pdf-mage-api
-APP_ROOT=$HOME/pdf-mage
-PID_FILE=/var/run/sideqik/$APP_NAME.pid
-LOG_FILE=/var/pdfs/log/$APP_NAME.log
+PID_FILE=$PDFMAGE_PID_DIR/$APP_NAME.pid
+LOG_FILE=$PDFMAGE_LOG_DIR/$APP_NAME.log
 
 start() {
   cd $APP_ROOT
