@@ -1,13 +1,23 @@
 #!/bin/bash
+
+BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+APP_ROOT="$(dirname "$BIN_DIR")"
+
+# These are usually overridden in .bashrc in production
+PDFMAGE_PID_DIR="${PDFMAGE_PID_DIR:-$APP_ROOT}"
+PDFMAGE_LOG_DIR="${PDFMAGE_LOG_DIR:-$APP_ROOT}"
+PDFMAGE_ENV="${PDFMAGE_ENV:-development}"
+SIDEKIQ_CONCURRENCY="${SIDEKIQ_CONCURRENCY:-10}"
+
+# Usually you don't edit these
 APP_NAME=pdf-mage-sidekiq
-APP_ROOT=$HOME/pdf-mage
-PID_FILE=/var/run/sideqik/$APP_NAME.pid
-LOG_FILE=/var/pdfs/log/$APP_NAME.log
+PID_FILE=$PDFMAGE_PID_DIR/$APP_NAME.pid
+LOG_FILE=$PDFMAGE_LOG_DIR/$APP_NAME.log
 
 start() {
   cd $APP_ROOT
-  echo "Starting $APP_NAME..."
-  PDFMAGE_ENV=production bundle exec sidekiq -r $APP_ROOT/lib/pdf_mage_workers.rb -q pdfmage -c $SIDEKIQ_CONCURRENCY > $LOG_FILE 2>&1 &
+  echo "Starting $APP_NAME (env=$PDFMAGE_ENV, log=$LOG_FILE, pid=$PID_FILE)..."
+  APP_ROOT=$APP_ROOT bundle exec sidekiq -r $APP_ROOT/lib/pdf_mage_workers.rb -q pdfmage -c $SIDEKIQ_CONCURRENCY > $LOG_FILE 2>&1 &
   echo $! > $PID_FILE
   RETVAL=$?
 }
